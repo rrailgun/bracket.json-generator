@@ -1,5 +1,5 @@
 #Builds
-.exe
+*.exe
 
 # Logs
 logs
