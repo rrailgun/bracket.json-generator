@@ -58,8 +58,7 @@ inquirer.prompt([
         }
     })
 
-
-function mainMenu() {
+function updateTeamMenu() {
     inquirer.prompt([
         {
             type: 'list',
@@ -69,52 +68,100 @@ function mainMenu() {
                 { name: "Populate teams from teams.tsv", value: "populateTeams" },
                 { name: "Add seedings to teams", value: 'addSeedings' },
                 { name: "Add qualifier stat data", value: "addQualStatsInfo" },
-                { name: "Populate round with beatmaps from beatmaps.tsv", value: "populateBeatmaps" },
+                { name: "Return to main menu", value: "returnToMainMenu" }
+            ]
+        }
+    ])
+    .then( answer => {
+        switch(answer.operations) {
+            case 'populateTeams':
+                populateTeams();
+                break;
+            case 'addQualStatsInfo':
+                addQualStatsInfo();
+                break;
+            case 'addSeedings':
+                    teamSeeding();
+                    break;
+            case 'returnToMainMenu':
+                mainMenu();
+                break;
+        }
+    })
+}
+
+function matchMenu() {
+    inquirer.prompt([
+        {
+            type: 'list',
+            message: "Select an operation to modify bracket.json",
+            name: 'operations',
+            choices: [
                 { name: "Create initial matchups \x1b[31m\x1b[1m(WARNING: THIS SHOULD ONLY BE USED WITH A TEMPLATE MADE FROM THIS SCRIPT)\x1b[0m", value: 'createMatchups' },
                 { name: "Update a rounds match data from matches.tsv", value: "updateMatches" },
-                { name: "Save and exit bracket editor", value: "exitSave" },
-                { name: "Exit bracket editor without saving", value: "exitNoSave" }
+                { name: "Return to main menu", value: "returnToMainMenu" }
             ]
         }
     ])
         .then(answer => {
             switch (answer.operations) {
-                //TODO: Promise implementation for easier resending to Main Menu?
-                case 'populateTeams':
-                    populateTeams();
-                    break;
-                case 'addQualStatsInfo':
-                    addQualStatsInfo();
-                    break;
-                case 'populateBeatmaps':
-                    populateBeatmaps();
-                    break;
                 case 'updateMatches':
                     updateMatches();
-                    break;
-                case 'addSeedings':
-                    teamSeeding();
                     break;
                 case 'createMatchups':
                     populateInitialBracket();
                     break;
-                case 'exitSave':
-                    fs.writeFile('bracket.json', JSON.stringify(bracket, null, 4), err => {
-                        if (err) {
-                            console.log(err);
-                            mainMenu();
-                        }
-                        else {
-                            console.log("bracket.json saved. Exiting...")
-                            process.exit()
-                        }
-                    });
+                case 'returnToMainMenu':
+                    mainMenu();
                     break;
-                case 'exitNoSave':
-                    console.log("Exiting without saving...")
-                    process.exit();
             }
         })
+}
+
+function mainMenu() {
+
+    inquirer.prompt([
+        {
+            type: 'list',
+            message: "Select an operation to modify bracket.json",
+            name: 'mainMenuOption',
+            choices: [
+                { name: "Update team data", value: "updateTeam" },
+                { name: "Update match data", value: "updateMatch" },
+                { name: "Populate round with beatmaps from beatmaps.tsv", value: "populateBeatmaps" },
+                { name: "Save and exit bracket editor", value: "exitSave" },
+                { name: "Exit bracket editor without saving", value: "exitNoSave" }
+            ]
+        }
+    ])
+    .then( answer => {
+        switch(answer.mainMenuOption) {
+            case "updateTeam":
+                updateTeamMenu();
+                break;
+            case "updateMatch":
+                matchMenu();
+                break;
+            case 'populateBeatmaps':
+                populateBeatmaps();
+                break;
+            case 'exitSave':
+                fs.writeFile('bracket.json', JSON.stringify(bracket, null, 4), err => {
+                    if (err) {
+                        console.log(err);
+                        mainMenu();
+                    }
+                    else {
+                        console.log("bracket.json saved. Exiting...")
+                        process.exit()
+                    }
+                });
+                break;
+            case 'exitNoSave':
+                console.log("Exiting without saving...")
+                process.exit();
+        }
+    })
 }
 
 function populateInitialBracket() {
@@ -221,6 +268,7 @@ function populateBeatmaps() {
                     round.Beatmaps.push({ ID: splitData[1], Mods: splitData[0] })
                 })
                 bracket.Rounds[answers.selectedRound] = round;
+                console.log("Beatmaps imported")
                 mainMenu()
             })
         })
@@ -339,7 +387,7 @@ function addQualStatsInfo() {
                 bracket.Teams[modRank[i]['teamIndex']]["SeedingResults"][j]["Seed"] = i + 1;
             }
         })
-        console.log("Qualifier stats data imported")
+        console.log("Mod seeds imported")
         mainMenu();
     })
 }

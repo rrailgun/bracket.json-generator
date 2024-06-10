@@ -1,5 +1,6 @@
 #Builds
 *.exe
+bracket.json
 
 # Logs
 logs
