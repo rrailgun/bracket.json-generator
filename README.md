@@ -15,6 +15,7 @@ This script aims to save time setting up and updating the bracket.json file by:
 - Utilize the imported seedings to create the initial matchups in the bracket
 - Update the scores and match times for matches in a round from a `matches.tsv` file.
 
-## Instructions
+## Demo
 
-TBD
+### [Watch this demo on YouTube](https://youtu.be/1oM-fL3rgAc)
+[![Watch the video](https://img.youtube.com/vi/1oM-fL3rgAc/maxresdefault.jpg)](https://youtu.be/1oM-fL3rgAc)
